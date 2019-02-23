@@ -45,27 +45,27 @@ def draw(screen, grid, rows):
 
 
 def main():
-    # number = input("Please enter map number: ")
-    # filename = "map_{}.txt".format(number)
-    # f = open("maps/{}".format(filename), "r")
-    # str_grid = f.read()
-    # f.close()
-    # grid = eval(str_grid)
+    number = input("Please enter map number: ")
+    filename = "map_{}.txt".format(number)
+    f = open("maps/{}".format(filename), "r")
+    str_grid = f.read()
+    f.close()
+    grid = eval(str_grid)
 
-    grid = []
-    for row in range(101):
-        grid.append([])
-        for col in range(101):
-            grid[row].append(0)
-    gridLength = len(grid)
-    for i in range(gridLength):
-        for j in range(gridLength):
-            if random.random() < 0.90:
-                continue
-            else:
-                grid[i][j] = 1
-    grid[0][0] = 2
-    grid[gridLength - 1][gridLength - 1] = -1
+    # grid = []
+    # for row in range(101):
+    #     grid.append([])
+    #     for col in range(101):
+    #         grid[row].append(0)
+    # gridLength = len(grid)
+    # for i in range(gridLength):
+    #     for j in range(gridLength):
+    #         if random.random() < 0.80:
+    #             continue
+    #         else:
+    #             grid[i][j] = 1
+    # grid[0][0] = 2
+    # grid[gridLength - 1][gridLength - 1] = -1
 
     start_state = (0, 0)
     goal_state = (len(grid)-1, len(grid)-1)
@@ -143,6 +143,7 @@ def main():
                     pygame.display.update()
                     time = stop - start
                     print('Adaptive A*. Time Taken: {} secs, Distance: {}'.format(time, a_star.distance))
+                    a_star.re_init()
 
 
 if __name__ == "__main__":

@@ -24,6 +24,7 @@ class AStar:
         self.start_state = start_state
         self.goal_state = goal_state
         self.f = {}
+        self.h = {}
         self.g = {}
         self.closed_list = set()
         self.visited = set()
@@ -35,6 +36,7 @@ class AStar:
     def re_init(self):
         self.f = {}
         self.g = {}
+        self.h = {}
         self.closed_list = set()
         self.visited = set()
         self.blocked = set()
@@ -47,22 +49,19 @@ class AStar:
         return abs(s1[0] - s2[0]) + abs(s1[1] - s2[1])
 
     def compute_path_adaptive(self, start, gd):
-
         closed_list = set()
 
         came_from = {}
 
         open_list = []
 
-        self.closed_list.add(start)
+        g_score = {start: 0}
 
-        self.g_score = {start: 0}
+        h_score = {start: gd}
 
-        self.h_score = {start: AStar.manhattan_distance(start, self.goal_state)}
+        f_score = {start: gd}
 
-        self.f_score = {start: AStar.manhattan_distance(start, self.goal_state)}
-
-        heappush(open_list, (self.f_score[start], start))
+        heappush(open_list, (f_score[start], start))
 
         while open_list:
             current = heappop(open_list)[1]
@@ -72,8 +71,15 @@ class AStar:
                 while current in came_from:
                     total_path.append(current)
                     current = came_from[current]
-                    total_path.append(start)
-                print(total_path)
+                total_path.append(start)
+
+                gd = len(total_path)
+
+                for node in closed_list:
+                    self.h[node] = gd - g_score[node]
+
+                for node in total_path:
+                    self.h[node] = gd - g_score[node]
                 return total_path
 
             closed_list.add(current)
@@ -88,28 +94,30 @@ class AStar:
                     continue
 
                 else:
-                    neighbour_g_score = self.g_score[current] + 1
+                    neighbour_g_score = g_score[current] + 1
 
-                    tentative_previous_g_score = self.g_score.get(neighbor, 0)
+                    tentative_previous_g_score = g_score.get(neighbor, 0)
 
                     if (neighbor in closed_list) and (neighbour_g_score >= tentative_previous_g_score):
                         continue
 
                     if (neighbour_g_score < tentative_previous_g_score) or (neighbor not in [i[1] for i in open_list]):
                         if neighbour_g_score < tentative_previous_g_score:
-                            open_list.remove((self.f_score[neighbor], neighbor))
+                            open_list.remove((f_score[neighbor], neighbor))
                             heapify(open_list)
 
                         came_from[neighbor] = current
-                        self.g_score[neighbor] = neighbour_g_score
+                        g_score[neighbor] = neighbour_g_score
+                        self.g[neighbor] = neighbour_g_score
 
                         if neighbor in self.closed_list:
-                            self.h_score[neighbor] = gd - self.g_score[neighbor]
+                            h_score[neighbor] = self.h[neighbor]
                         else:
-                            self.h_score[neighbor] = AStar.manhattan_distance(neighbor, self.goal_state)
-                        self.f_score[neighbor] = neighbour_g_score + self.h_score[neighbor]
+                            h_score[neighbor] = AStar.manhattan_distance(neighbor, self.goal_state)
+
+                        f_score[neighbor] = neighbour_g_score + h_score[neighbor]
                         self.closed_list.add(neighbor)
-                        heappush(open_list, (self.f_score[neighbor], neighbor))
+                        heappush(open_list, (f_score[neighbor], neighbor))
         return False
 
     def compute_path(self, start, state):
@@ -138,7 +146,7 @@ class AStar:
 
             g_score = {self.goal_state: 0}
 
-            h_score = {self.start_state: AStar.manhattan_distance(self.goal_state, start)}
+            h_score = {self.goal_state: AStar.manhattan_distance(self.goal_state, start)}
 
             f_score = {self.goal_state: AStar.manhattan_distance(self.goal_state, start)}
 
@@ -230,7 +238,6 @@ class AStar:
 
             if state == "forward" or state == "adaptive":
                 path.reverse()
-
             for node in path:
                 if array[node[0]][node[1]] == 1:
                     blocked_index = path.index(node)
