@@ -48,7 +48,7 @@ class AStar:
     def manhattan_distance(cls, s1, s2):
         return abs(s1[0] - s2[0]) + abs(s1[1] - s2[1])
 
-    def compute_path_adaptive(self, start, gd):
+    def compute_path_adaptive(self, start):
         closed_list = set()
 
         came_from = {}
@@ -57,9 +57,9 @@ class AStar:
 
         g_score = {start: 0}
 
-        h_score = {start: gd}
+        h_score = {start: self.h.get(start, AStar.manhattan_distance(start, self.goal_state))}
 
-        f_score = {start: gd}
+        f_score = {start: h_score[start] + g_score[start]}
 
         heappush(open_list, (f_score[start], start))
 
@@ -71,15 +71,11 @@ class AStar:
                 while current in came_from:
                     total_path.append(current)
                     current = came_from[current]
-                total_path.append(start)
-
                 gd = len(total_path)
-
+                total_path.append(start)
                 for node in closed_list:
                     self.h[node] = gd - g_score[node]
-
-                for node in total_path:
-                    self.h[node] = gd - g_score[node]
+                self.h[self.goal_state] = gd - g_score[self.goal_state]
                 return total_path
 
             closed_list.add(current)
@@ -96,24 +92,25 @@ class AStar:
                 else:
                     neighbour_g_score = g_score[current] + 1
 
-                    tentative_previous_g_score = g_score.get(neighbor, 0)
+                    neighbor_previous_g_score = g_score.get(neighbor, 0)
 
-                    if (neighbor in closed_list) and (neighbour_g_score >= tentative_previous_g_score):
+                    if (neighbor in closed_list) and (neighbour_g_score >= neighbor_previous_g_score):
                         continue
 
-                    if (neighbour_g_score < tentative_previous_g_score) or (neighbor not in [i[1] for i in open_list]):
-                        if neighbour_g_score < tentative_previous_g_score:
+                    if (neighbour_g_score < neighbor_previous_g_score) or (neighbor not in [i[1] for i in open_list]):
+                        if neighbour_g_score < neighbor_previous_g_score:
                             open_list.remove((f_score[neighbor], neighbor))
                             heapify(open_list)
 
                         came_from[neighbor] = current
                         g_score[neighbor] = neighbour_g_score
-                        self.g[neighbor] = neighbour_g_score
 
-                        if neighbor in self.closed_list:
-                            h_score[neighbor] = self.h[neighbor]
-                        else:
-                            h_score[neighbor] = AStar.manhattan_distance(neighbor, self.goal_state)
+                        h_score[neighbor] = self.h.get(neighbor, AStar.manhattan_distance(neighbor, self.goal_state))
+
+                        # if neighbor in self.closed_list:
+                        #     h_score[neighbor] = self.h[neighbor]
+                        # else:
+                        #     h_score[neighbor] = AStar.manhattan_distance(neighbor, self.goal_state)
 
                         f_score[neighbor] = neighbour_g_score + h_score[neighbor]
                         self.closed_list.add(neighbor)
@@ -224,11 +221,7 @@ class AStar:
 
         while check != self.goal_state:
             if state == "adaptive":
-                if start == self.start_state:
-                    gd = AStar.manhattan_distance(start, self.goal_state)
-                else:
-                    gd = len(path) - self.g[start]
-                path = self.compute_path_adaptive(start, gd)
+                path = self.compute_path_adaptive(start)
             else:
                 path = self.compute_path(start, state)
 
