@@ -13,4 +13,4 @@ A: Adaptive A*. \
 Return: adds fog of war to display. \
 C: restores the grid to its original state.
 
-## To exit close the window.
+## To exit close the program window.
