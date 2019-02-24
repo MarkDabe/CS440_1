@@ -80,7 +80,7 @@ class AStar:
 
             closed_list.add(current)
 
-            shuffle(NEIGHBOURS)
+            # shuffle(NEIGHBOURS)
             for i, j in NEIGHBOURS:
 
                 neighbor = current[0] + i, current[1] + j
@@ -169,7 +169,7 @@ class AStar:
 
             closed_list.add(current)
 
-            shuffle(NEIGHBOURS)
+            # shuffle(NEIGHBOURS)
             for i, j in NEIGHBOURS:
 
                 neighbor = current[0] + i, current[1] + j

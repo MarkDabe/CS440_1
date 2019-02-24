@@ -82,6 +82,7 @@ def main():
 
     a_star = AStar(rows, screen, start_state, goal_state)
     while not halt:
+        counter = 0
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 halt = True
@@ -102,12 +103,13 @@ def main():
                                               WIDTH, HEIGHT])
                     for path in paths:
                         for node in path:
+                            counter +=1
                             pygame.draw.rect(screen, YELLOW,
                                              [(MARGIN + WIDTH) * node[1] + MARGIN, (MARGIN + HEIGHT) * node[0] + MARGIN,
                                               WIDTH, HEIGHT])
                     pygame.display.update()
                     time = stop - start
-                    print('Forward A*. Time Taken: {} secs, Distance: {}'.format(time, a_star.distance))
+                    print('Forward A*. Time Taken: {} secs, Distance: {}'.format(time, counter))
                     a_star.re_init()
 
                 elif event.key == pygame.K_b:
@@ -120,12 +122,13 @@ def main():
                                               WIDTH, HEIGHT])
                     for path in paths:
                         for node in path:
+                            counter += 1
                             pygame.draw.rect(screen, YELLOW,
                                              [(MARGIN + WIDTH) * node[1] + MARGIN, (MARGIN + HEIGHT) * node[0] + MARGIN,
                                               WIDTH, HEIGHT])
                     pygame.display.update()
                     time = stop - start
-                    print('Backwards A*. Time Taken: {} secs, Distance: {},'.format(time, a_star.distance))
+                    print('Backwards A*. Time Taken: {} secs, Distance: {},'.format(time, counter))
                     a_star.re_init()
                 elif event.key == pygame.K_a:
                     start = timeit.default_timer()
@@ -137,12 +140,13 @@ def main():
                                           WIDTH, HEIGHT])
                     for path in paths:
                         for node in path:
+                            counter += 1
                             pygame.draw.rect(screen, YELLOW,
                                              [(MARGIN + WIDTH) * node[1] + MARGIN, (MARGIN + HEIGHT) * node[0] + MARGIN,
                                               WIDTH, HEIGHT])
                     pygame.display.update()
                     time = stop - start
-                    print('Adaptive A*. Time Taken: {} secs, Distance: {}'.format(time, a_star.distance))
+                    print('Adaptive A*. Time Taken: {} secs, Distance: {}'.format(time, counter))
                     a_star.re_init()
 
 
